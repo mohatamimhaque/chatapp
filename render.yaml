@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: chatapp
+    env: php
+    plan: free
+    buildCommand: |
+      # Install PHP dependencies if any
+      echo "Setting up ChatApp..."
+      
+      # Create necessary directories
+      mkdir -p upload/image
+      chmod 755 upload
+      chmod 755 upload/image
+      
+      # Set timezone
+      echo "date.timezone = Asia/Dhaka" >> /usr/local/etc/php/conf.d/timezone.ini
+      
+    startCommand: |
+      # Start PHP built-in server
+      php -S 0.0.0.0:$PORT -t .
+      
+    envVars:
+      - key: PHP_VERSION
+        value: "8.1"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: chatapp-db
+          property: connectionString
+          
+  - type: pserv
+    name: chatapp-db
+    env: mysql
+    plan: free
+    database: chatapp
+    user: chatapp_user
